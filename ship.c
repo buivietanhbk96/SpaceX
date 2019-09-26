@@ -1,5 +1,5 @@
 #include "ship.h"
-pthread_mutex_t ship_mutex;
+pthread_mutex_t draw_mutex;
 const char ship_x[4][15] ={"   /^\\"," |/| |\\|","|       |"," *-\"\"\"-*"};
 const char ship_del[4][15] ={"      ","        ","         ","        "};
 static int win_line;
@@ -29,25 +29,25 @@ Spaceship_t *init_spaceship(void)
 static void _clean_draw_ship(Spaceship_t *ship)
 {
     int i;
-    pthread_mutex_lock(&ship_mutex);
+    pthread_mutex_lock(&draw_mutex);
     for(i = 0; i < 4; i++)
     {
         gotoxy((ship->sx) + i,ship->sy);
         printf("%s\n",ship_del[i]);
     }
-    pthread_mutex_unlock(&ship_mutex);
+    pthread_mutex_unlock(&draw_mutex);
 }
 
 void draw_spaceship(Spaceship_t *ship)
 {   
     int i;
-    pthread_mutex_lock(&ship_mutex);
+    pthread_mutex_lock(&draw_mutex);
     for(i = 0; i < 4; i++)
     {
         gotoxy((ship->sx) + i,ship->sy);
         printf("%s\n",ship_x[i]);
     }
-    pthread_mutex_unlock(&ship_mutex);
+    pthread_mutex_unlock(&draw_mutex);
 }
 
 void move_spaceship(Spaceship_t *ship, enum direction_t direct)

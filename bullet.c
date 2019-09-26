@@ -1,6 +1,6 @@
 #include "bullet.h"
 
-pthread_mutex_t bullet_muxtex;
+extern pthread_mutex_t draw_mutex;
 Bullet_t * create_bullet(int x, int y)  /* x and y are cordinates of the ship */
 {
     Bullet_t *bullet =  (Bullet_t *)malloc(sizeof(Bullet_t));
@@ -15,18 +15,18 @@ void draw_bullet(Bullet_t *bullet)
 {
     // gotoxy(0,0);
     // printf("x= %d,y= %d                            ",bullet->sx,bullet->sy);
-    pthread_mutex_lock(&bullet_muxtex);
+    pthread_mutex_lock(&draw_mutex);
     gotoxy(bullet->sx, bullet->sy);
     printf("%c", BULLET_CHAR);
-    pthread_mutex_unlock(&bullet_muxtex);
+    pthread_mutex_unlock(&draw_mutex);
     
 }
 void clean_old_bullet(Bullet_t *bullet)
 {
-    pthread_mutex_lock(&bullet_muxtex);
+    pthread_mutex_lock(&draw_mutex);
     gotoxy(bullet->sx + 1, bullet->sy);
     printf(" ");
-    pthread_mutex_unlock(&bullet_muxtex);
+    pthread_mutex_unlock(&draw_mutex);
 }
 void *handle_bullet(void *arg)
 {
@@ -37,9 +37,9 @@ void *handle_bullet(void *arg)
         if(mbullet->sx >= 1)
         {
             draw_bullet(mbullet);
-            usleep(10000);
+            usleep(20000);
             mbullet->sx -= 1;
-            /* xoa vi tri cu cua vien dan */
+            /* clean old position of the bullet - replace '*' with ' ' */
             clean_old_bullet(mbullet);
 
         }
@@ -51,4 +51,5 @@ void *handle_bullet(void *arg)
     } 
     free(mbullet);
     pthread_exit(NULL);
+    //return NULL;
 }

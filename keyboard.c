@@ -5,7 +5,7 @@ keyQueue_t *keyhead = NULL;
 pthread_mutex_t kqmutex;
 static struct termios origtc, newtc;
 
-extern game_status;
+extern int game_status;
 void *read_keyboard(void *arg)
 {
     static struct termios oldt, newt;
@@ -37,7 +37,7 @@ void *read_keyboard(void *arg)
             }
             pthread_mutex_unlock(&kqmutex);
         } 
-        usleep(10);                
+        //usleep(10);                
     }
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);                 /* settings back to normal */
     return NULL;
