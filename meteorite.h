@@ -11,6 +11,8 @@
 #define METEO_CHAR_SMALL "\u2588\u2588"
 #define METEO_CHAR_MEDIUM "\u2588\u2588\u2588\u2588\u2588"
 #define METEO_CHAR_LARGE "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+
+#define SPEED_METEORITE 400000
 enum meteo_scale_t {SMALL, MEDIUM, LARGE};
 typedef struct 
 {

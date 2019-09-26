@@ -1,12 +1,12 @@
 #include "meteorite.h"
 
-//extern pthread_mutex_t meteo_mutex;
-pthread_mutex_t meteo_mutex;
+extern pthread_mutex_t draw_mutex;
+//pthread_mutex_t draw_mutex;
 static int win_x, win_y;
 static void _clear_meteor(Meteorite_t *meteor);
 void draw_meteorite(Meteorite_t *meteor)
 {
-    pthread_mutex_lock(&meteo_mutex);
+    pthread_mutex_lock(&draw_mutex);
     gotoxy(meteor->sx, meteor->sy);
     switch (meteor->scale)
     {
@@ -21,31 +21,31 @@ void draw_meteorite(Meteorite_t *meteor)
         break;            
     }
     meteor->sx +=1;
-    pthread_mutex_unlock(&meteo_mutex);
+    pthread_mutex_unlock(&draw_mutex);
 }
 static void _clear_meteor(Meteorite_t *meteor)
 {
-    pthread_mutex_lock(&meteo_mutex);
+    pthread_mutex_lock(&draw_mutex);
     switch (meteor->scale)
     {
     case SMALL:
-        gotoxy(meteor->sx  - 1,meteor->sy);
+        gotoxy(meteor->sx  - 2,meteor->sy);
         printf("  ");
         break;
     case MEDIUM:
         
-        gotoxy(meteor->sx  - 2,meteor->sy);
+        gotoxy(meteor->sx  - 3,meteor->sy);
         printf("     ");
 
         break;
     case LARGE:
 
-        gotoxy(meteor->sx  - 4,meteor->sy);
+        gotoxy(meteor->sx  - 5,meteor->sy);
         printf("          ");
         
         break;
     }
-    pthread_mutex_unlock(&meteo_mutex);
+    pthread_mutex_unlock(&draw_mutex);
 }
 /* Ham nay co chuc nang tao ra 1 thien thach voi kich thuoc va vi tri ngau nhien tren top screen */
 Meteorite_t *create_meteorite(void)
@@ -86,7 +86,7 @@ void *handle_meteorite(void *arg)
         {
             _clear_meteor(meteorx);
         }
-        usleep(50000);
+        usleep(SPEED_METEORITE);
         if(meteorx->sx > win_x + 4)
         {
             break;

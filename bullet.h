@@ -9,7 +9,8 @@
 #include "utilities.h"
 #include "ship.h"
 
-#define BULLET_CHAR   '*'
+#define BULLET_CHAR   "\ua537"
+#define BULLET_SPEED 20000
 typedef struct {
 	int sx;
 	int sy;

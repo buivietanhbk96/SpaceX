@@ -13,11 +13,9 @@ Bullet_t * create_bullet(int x, int y)  /* x and y are cordinates of the ship */
 
 void draw_bullet(Bullet_t *bullet)
 {
-    // gotoxy(0,0);
-    // printf("x= %d,y= %d                            ",bullet->sx,bullet->sy);
     pthread_mutex_lock(&draw_mutex);
     gotoxy(bullet->sx, bullet->sy);
-    printf("%c", BULLET_CHAR);
+    printf(BULLET_CHAR);
     pthread_mutex_unlock(&draw_mutex);
     
 }
@@ -37,7 +35,7 @@ void *handle_bullet(void *arg)
         if(mbullet->sx >= 1)
         {
             draw_bullet(mbullet);
-            usleep(20000);
+            usleep(BULLET_SPEED);
             mbullet->sx -= 1;
             /* clean old position of the bullet - replace '*' with ' ' */
             clean_old_bullet(mbullet);

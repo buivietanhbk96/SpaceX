@@ -7,10 +7,10 @@
 #include "meteorite.h"
 
 
-#define MAX_BULLET 1000            /* number of thread use for create bullet (each bullet is one thread) */
-#define MAX_METEOR 1000            /* number of thread use for create meteorite (each meteorite is one thread) */
-#define SPEED_GEN_BULLET 50000      /* period to create bullet  (us)*/
-#define SPEED_GEN_METEORITE 5      /* period to create bullet  (s)*/
+#define MAX_BULLET 1000             /* number of thread use for create bullet (each bullet is one thread) */
+#define MAX_METEOR 1000             /* number of thread use for create meteorite (each meteorite is one thread) */
+#define SPEED_GEN_BULLET 80000      /* period to create bullet  (us)*/
+#define SPEED_GEN_METEORITE 5       /* period to create bullet  (s)*/
 int game_status = PLAYING_STATUS;
 Spaceship_t *my_ship = NULL;
 extern keyQueue_t *keyhead;
@@ -46,7 +46,7 @@ void *generate_meteorite(void *arg)
             i = 0;
         }
         pthread_create(&meteorites[i],NULL, handle_meteorite, NULL);
-        /* pthread_join(bullet[i], NULL);  don't use pthread_join at here*/
+        /* pthread_join(meteorites[i], NULL);  don't use pthread_join at here*/
         i = i + 1;
         sleep(SPEED_GEN_METEORITE);
     }
@@ -100,15 +100,17 @@ void *control(void *arg)
 }
 int main(void)
 {
-    pthread_t thread[3];
+    pthread_t thread[4];
     printf("\e[?25l\033[H\033[J");   /*clear screen and hide cursor */
     my_ship = init_spaceship();
     draw_spaceship(my_ship);
     pthread_create(&thread[0], NULL, read_keyboard,NULL );
     pthread_create(&thread[1], NULL, control,NULL );
     pthread_create(&thread[2], NULL, generate_meteorite ,NULL );
+    pthread_create(&thread[3], NULL, generate_bullet ,NULL );
     pthread_join(thread[0], NULL);
     pthread_join(thread[1], NULL); 
     pthread_join(thread[2], NULL); 
+    pthread_join(thread[3], NULL); 
     return 0;
 }
