@@ -1,3 +1,3 @@
 src=$(wildcard *.c)
 all:
-	gcc $(src) -o ex -lpthread
+	gcc $(src) -o SpaceX -lpthread

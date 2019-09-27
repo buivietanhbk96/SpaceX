@@ -1,6 +1,9 @@
 #include "bullet.h"
 
 extern pthread_mutex_t draw_mutex;
+extern int win_col;
+extern int map_arr[MAX_ROW][MAX_COLUMN];
+extern pthread_mutex_t access_map_arr_mutex;
 Bullet_t * create_bullet(int x, int y)  /* x and y are cordinates of the ship */
 {
     Bullet_t *bullet =  (Bullet_t *)malloc(sizeof(Bullet_t));
@@ -10,35 +13,46 @@ Bullet_t * create_bullet(int x, int y)  /* x and y are cordinates of the ship */
 
     return bullet;
 }
-
-void draw_bullet(Bullet_t *bullet)
+static void _update_position_bullet(Bullet_t *bullet, int value)
+{
+    pthread_mutex_lock(&access_map_arr_mutex);
+    map_arr[bullet->sx][bullet->sy] = value;
+    pthread_mutex_unlock(&access_map_arr_mutex);    
+}
+static void _draw_bullet(Bullet_t *bullet)
 {
     pthread_mutex_lock(&draw_mutex);
     gotoxy(bullet->sx, bullet->sy);
     printf(BULLET_CHAR);
     pthread_mutex_unlock(&draw_mutex);
-    
+    _update_position_bullet(bullet, BULLET);
 }
-void clean_old_bullet(Bullet_t *bullet)
+static void _clean_old_bullet(Bullet_t *bullet)
 {
     pthread_mutex_lock(&draw_mutex);
-    gotoxy(bullet->sx + 1, bullet->sy);
+    gotoxy(bullet->sx, bullet->sy);
     printf(" ");
     pthread_mutex_unlock(&draw_mutex);
+    _update_position_bullet(bullet, EMPTY);
 }
 void *handle_bullet(void *arg)
 {
-    Spaceship_t *ship = (Spaceship_t *)arg;
-    Bullet_t *mbullet = create_bullet(ship->sx, ship->sy);
+    Spaceship_t *uship = (Spaceship_t *)arg;
+    Bullet_t *mbullet = create_bullet(uship->sx, uship->sy);
     while(1)
     {    
+        if(METEOR == check_coordinate_bullet(mbullet->sx,mbullet->sy)) 
+        {
+            break;
+        }
+
         if(mbullet->sx >= 1)
         {
-            draw_bullet(mbullet);
+            _draw_bullet(mbullet);
             usleep(BULLET_SPEED);
-            mbullet->sx -= 1;
             /* clean old position of the bullet - replace '*' with ' ' */
-            clean_old_bullet(mbullet);
+            _clean_old_bullet(mbullet);
+            mbullet->sx -= 1;
 
         }
         else 

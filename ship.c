@@ -1,9 +1,11 @@
 #include "ship.h"
+
+extern int map_arr[MAX_ROW][MAX_COLUMN];
+extern pthread_mutex_t access_map_arr_mutex;
 pthread_mutex_t draw_mutex;
 const char ship_x[4][15] ={"   /^\\"," |/| |\\|","|       |"," *-\"\"\"-*"};
 const char ship_del[4][15] ={"      ","        ","         ","        "};
-static int win_line;
-static int win_col;
+int win_line, win_col;
 static void _clean_draw_ship(Spaceship_t *ship);
 Spaceship_t *init_spaceship(void)
 {
@@ -23,6 +25,36 @@ Spaceship_t *init_spaceship(void)
     }
     return spaceship;
 }
+static void _update_position_ship(Spaceship_t *ship, int value)
+{
+    int i,j;
+    pthread_mutex_lock(&access_map_arr_mutex);
+    for (i = 0; i < 4; i++)
+    {
+        if (0 == i)
+        {
+            for(j = 0; j < 3;j++)
+            {
+                map_arr[ship->sx][ship->sy + 3 + j]= value;
+            }
+        }
+        if ((1 == i) || (3 == i))
+        {
+            for (j = 0; j < 7; j++)
+            {
+                map_arr[ship->sx][ship->sy + 1 + j]= value; 
+            }
+        }
+        if (2 == i)
+        {
+            for (j = 0; j < 9; j++)
+            {
+                map_arr[ship->sx][ship->sy + j]= value;
+            }
+        }
+    }
+    pthread_mutex_unlock(&access_map_arr_mutex);
+}
 /*
 * delete old char when moving the ship
 */
@@ -36,6 +68,7 @@ static void _clean_draw_ship(Spaceship_t *ship)
         printf("%s\n",ship_del[i]);
     }
     pthread_mutex_unlock(&draw_mutex);
+    _update_position_ship(ship,EMPTY);
 }
 
 void draw_spaceship(Spaceship_t *ship)
@@ -48,6 +81,7 @@ void draw_spaceship(Spaceship_t *ship)
         printf("%s\n",ship_x[i]);
     }
     pthread_mutex_unlock(&draw_mutex);
+    _update_position_ship(ship,SHIP);
 }
 
 void move_spaceship(Spaceship_t *ship, enum direction_t direct)

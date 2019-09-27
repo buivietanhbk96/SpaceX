@@ -10,14 +10,15 @@
 #include "ship.h"
 
 #define BULLET_CHAR   "\ua537"
-#define BULLET_SPEED 20000
+#define BULLET_SPEED 80000
 typedef struct {
 	int sx;
 	int sy;
 	bool gone;
 } Bullet_t;
 
-void draw_bullet(Bullet_t *bullet);
-Bullet_t * create_bullet(int x, int y);
+static void _clean_old_bullet(Bullet_t *bullet);
+static void _draw_bullet(Bullet_t *bullet);
+Bullet_t *create_bullet(int x, int y);
 void *handle_bullet(void *arg);
 #endif

@@ -9,15 +9,21 @@
 
 #define MAX_BULLET 1000             /* number of thread use for create bullet (each bullet is one thread) */
 #define MAX_METEOR 1000             /* number of thread use for create meteorite (each meteorite is one thread) */
-#define SPEED_GEN_BULLET 80000      /* period to create bullet  (us)*/
+#define SPEED_GEN_BULLET 180000      /* period to create bullet  (us)*/
 #define SPEED_GEN_METEORITE 5       /* period to create bullet  (s)*/
+
+int map_arr[MAX_ROW][MAX_COLUMN];
 int game_status = PLAYING_STATUS;
 Spaceship_t *my_ship = NULL;
 extern keyQueue_t *keyhead;
 pthread_mutex_t kqmutex;
+pthread_mutex_t access_map_arr_mutex;
 
 void *generate_bullet(void *arg)
 {
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, 1);
     pthread_t bullet[MAX_BULLET];
     int i = 0;
     while(PLAYING_STATUS == game_status)
@@ -26,17 +32,22 @@ void *generate_bullet(void *arg)
         {
             i = 0;
         }
-        pthread_create(&bullet[i],NULL, handle_bullet, (void *)my_ship);
+        pthread_create(&bullet[i],&attr, handle_bullet, (void *)my_ship);
         /* pthread_join(bullet[i], NULL);  don't use pthread_join at here*/
+        //pthread_detach(bullet[i]);
         i = i + 1;
         usleep(SPEED_GEN_BULLET);
 
     }
+    pthread_attr_destroy(&attr);
     pthread_exit(NULL);
 }
 
 void *generate_meteorite(void *arg)
 {
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, 1);
     pthread_t meteorites[MAX_METEOR];
     int i = 0;
     while(PLAYING_STATUS == game_status)
@@ -45,11 +56,13 @@ void *generate_meteorite(void *arg)
         {
             i = 0;
         }
-        pthread_create(&meteorites[i],NULL, handle_meteorite, NULL);
+        pthread_create(&meteorites[i],&attr, handle_meteorite, NULL);
         /* pthread_join(meteorites[i], NULL);  don't use pthread_join at here*/
+        //pthread_detach(meteorites[i]);
         i = i + 1;
         sleep(SPEED_GEN_METEORITE);
     }
+    pthread_attr_destroy(&attr);
     pthread_exit(NULL);
 }
 void *control(void *arg)
@@ -98,10 +111,15 @@ void *control(void *arg)
     }
     pthread_exit(NULL);
 }
+static void _create_map()
+{
+    memset(map_arr, 0, sizeof(int) * MAX_ROW * MAX_COLUMN);
+}
 int main(void)
 {
     pthread_t thread[4];
     printf("\e[?25l\033[H\033[J");   /*clear screen and hide cursor */
+    _create_map();
     my_ship = init_spaceship();
     draw_spaceship(my_ship);
     pthread_create(&thread[0], NULL, read_keyboard,NULL );
@@ -112,5 +130,6 @@ int main(void)
     pthread_join(thread[1], NULL); 
     pthread_join(thread[2], NULL); 
     pthread_join(thread[3], NULL); 
+    printf("GAME OVER");
     return 0;
 }

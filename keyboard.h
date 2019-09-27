@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <strings.h>
 #include <string.h>
 #include <termios.h>
 #include <sys/types.h>

@@ -19,6 +19,8 @@ typedef struct
     int sx;
     int sy;
     enum meteo_scale_t scale;
+    int health;
+    int length;
     int meteo_interval;
     int speed;
 }Meteorite_t;
