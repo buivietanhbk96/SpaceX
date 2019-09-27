@@ -136,7 +136,7 @@ void *handle_meteorite(void *arg)
             usleep(SPEED_METEORITE);
             if (meteorx->sx > win_line + 4)
             {
-                break;
+                break ;
             }
         }
     }
