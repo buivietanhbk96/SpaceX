@@ -9,12 +9,12 @@
 #include "utilities.h"
 #include "ship.h"
 
-#define BULLET_CHAR   "\ua537"
-#define BULLET_SPEED 80000
+//#define BULLET_CHAR   "\ua537"
+#define BULLET_CHAR   "*"
+#define BULLET_SPEED 20000
 typedef struct {
 	int sx;
 	int sy;
-	bool gone;
 } Bullet_t;
 
 static void _clean_old_bullet(Bullet_t *bullet);

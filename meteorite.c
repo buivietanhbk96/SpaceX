@@ -8,23 +8,24 @@ extern int win_line;
 static void _clear_meteor(Meteorite_t *meteor);
 static void _update_position_meteor(Meteorite_t *meteor, int value)
 {
-    int i, length;
-    switch (meteor->scale)
-    {
-    case SMALL:
-        length = 2;
-        break;
-    case MEDIUM:
-        length = 5;
-        break;
-    case LARGE:
-        length = 10;
-        break;
-    }
+    int i;
     pthread_mutex_lock(&access_map_arr_mutex);
-    for(i = 0; i < length; i++)
+    if (EMPTY == value)
     {
-        map_arr[meteor->sx][meteor->sy + i] = value;
+        if((meteor->sx - meteor->height - 1) >= 0)
+        {
+            for (i = 0; i < meteor->length; i++)
+            {
+                map_arr[meteor->sx - meteor->height - 1][meteor->sy + i] = value;
+            }
+        }
+    }
+    else
+    {
+        for (i = 0; i < meteor->length; i++)
+        {
+            map_arr[meteor->sx][meteor->sy + i] = value;
+        }
     }
     pthread_mutex_unlock(&access_map_arr_mutex);
 }
@@ -71,31 +72,47 @@ static void _clear_meteor(Meteorite_t *meteor)
     pthread_mutex_unlock(&draw_mutex);
     _update_position_meteor(meteor,EMPTY);
 }
+static void _destroy_meteor(Meteorite_t *meteor)
+{
+    int i, temp;
+    temp = meteor->sx + meteor->height;
+    for(i = 0; i < meteor->height; i++)
+    {
+        meteor->sx = temp - i;
+        _clear_meteor(meteor);
+    }
+}
 /* Ham nay co chuc nang tao ra 1 thien thach voi kich thuoc va vi tri ngau nhien tren top screen */
 Meteorite_t *create_meteorite(void)
 {
     
     Meteorite_t *meteor = (Meteorite_t *)malloc(sizeof(Meteorite_t));
+    if(NULL == meteor)
+    {
+        printf("out of memory to create meteor");
+        return NULL;
+    }
     meteor->sx = 0;
+    srand(time(0)); 
     meteor->scale = rand() % 3;
     switch (meteor->scale)
     {
     case SMALL:
         meteor->sy = rand() % (win_col - 2);    /* 2 is length of small string meteor */
-        meteor->meteo_interval = 1;
-        meteor->health = 15;
+        meteor->height = 1;
+        meteor->health = 10;
         meteor->length = 2;
         break;
     case MEDIUM:
         meteor->sy = rand() % (win_col - 5);    /* 5 is length of medium string meteor */
-        meteor->meteo_interval = 2;
-        meteor->health = 30;
+        meteor->height = 2;
+        meteor->health = 20;
         meteor->length = 5;
         break;
     case LARGE:
         meteor->sy = rand() % (win_col - 10);   /* 10 is length of large string meteor */
-        meteor->meteo_interval = 4;
-        meteor->health = 60;
+        meteor->height = 4;
+        meteor->health = 30;
         meteor->length = 10;
         break;
     }
@@ -105,42 +122,41 @@ Meteorite_t *create_meteorite(void)
 
 void *handle_meteorite(void *arg)
 {
-    int count = 0, rt_check;
+    int rt_check = 0;
     Meteorite_t *meteorx = create_meteorite();
     while(1)
     {
+        if(NULL == meteorx)
+        {
+            break;
+        }
+        draw_meteorite(meteorx);
+        _clear_meteor(meteorx);
+        usleep(SPEED_METEORITE);
+        if (meteorx->sx > (win_line + 4))
+        {
+            break;
+        }
         rt_check = check_coordinate_meteor(meteorx->sx, meteorx->sy, meteorx->length);
         if(BULLET == rt_check)
         {
-            meteorx->health -= 5;
+            meteorx->health = meteorx->health - 10;
             if(0 == meteorx->health)
             {
-                printf("kill the meteor");
+                add_score(meteorx->scale);
+                _destroy_meteor(meteorx);
                 break;
-            }
-                
+            }        
         }
         else if(SHIP == rt_check)
         {
-            /* the live of ship -= 1*/
+            add_score(meteorx->scale);
+            lose_one_life();
+            _destroy_meteor(meteorx);
+            /* The ship loses 1 life*/
             break;
         }
-        else
-        {
-            draw_meteorite(meteorx);
-            count++;
-            if (count > (meteorx->meteo_interval))
-            {
-                _clear_meteor(meteorx);
-            }
-            usleep(SPEED_METEORITE);
-            if (meteorx->sx > win_line + 4)
-            {
-                break ;
-            }
-        }
     }
-    printf("kill the meteor");
     free(meteorx);
     pthread_exit(NULL);
 }

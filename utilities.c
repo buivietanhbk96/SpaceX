@@ -27,15 +27,17 @@ int check_coordinate_bullet(int x, int y)
 
 int check_coordinate_meteor(int x, int y, int length)
 {
-    int i;
+    int i, result = 0;
     pthread_mutex_lock(&access_map_arr_mutex);
-    for(i = 0; i < length; i++)
+
+    for (i = 0; i < length; i++)
     {
-        if(0 != map_arr[x][y + i])
+        if (0 != map_arr[x][y + i])
         {
-            return map_arr[x][y + i];
+            result = map_arr[x][y + i];
+            break;
         }
     }
     pthread_mutex_unlock(&access_map_arr_mutex);
-    return 0;
+    return result;
 }

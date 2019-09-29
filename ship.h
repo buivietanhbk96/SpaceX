@@ -24,5 +24,5 @@ typedef struct {
 Spaceship_t *init_spaceship(void);
 void draw_spaceship(Spaceship_t *ship);
 void move_spaceship(Spaceship_t *ship, enum direction_t direct);
-void fire_spaceship(Spaceship_t *ship);
+void lose_one_life();
 #endif

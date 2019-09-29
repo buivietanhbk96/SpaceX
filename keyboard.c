@@ -37,7 +37,7 @@ void *read_keyboard(void *arg)
             }
             pthread_mutex_unlock(&kqmutex);
         } 
-        //usleep(10);                
+        usleep(10);                
     }
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);                 /* settings back to normal */
     return NULL;

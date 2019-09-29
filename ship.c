@@ -35,21 +35,21 @@ static void _update_position_ship(Spaceship_t *ship, int value)
         {
             for(j = 0; j < 3;j++)
             {
-                map_arr[ship->sx][ship->sy + 3 + j]= value;
+                map_arr[ship->sx + i][ship->sy + 3 + j]= value;
             }
         }
         if ((1 == i) || (3 == i))
         {
             for (j = 0; j < 7; j++)
             {
-                map_arr[ship->sx][ship->sy + 1 + j]= value; 
+                map_arr[ship->sx + i][ship->sy + 1 + j]= value; 
             }
         }
         if (2 == i)
         {
             for (j = 0; j < 9; j++)
             {
-                map_arr[ship->sx][ship->sy + j]= value;
+                map_arr[ship->sx + i][ship->sy + j]= value;
             }
         }
     }

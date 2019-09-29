@@ -7,12 +7,13 @@
 #include <time.h>
 #include <unistd.h>
 #include "utilities.h"
+#include "score.h"
 
 #define METEO_CHAR_SMALL "\u2588\u2588"
 #define METEO_CHAR_MEDIUM "\u2588\u2588\u2588\u2588\u2588"
 #define METEO_CHAR_LARGE "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
 
-#define SPEED_METEORITE 400000
+#define SPEED_METEORITE 500000
 enum meteo_scale_t {SMALL, MEDIUM, LARGE};
 typedef struct 
 {
@@ -21,7 +22,7 @@ typedef struct
     enum meteo_scale_t scale;
     int health;
     int length;
-    int meteo_interval;
+    int height;
     int speed;
 }Meteorite_t;
 
