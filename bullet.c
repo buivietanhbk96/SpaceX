@@ -4,6 +4,7 @@ extern pthread_mutex_t draw_mutex;
 extern int win_col;
 extern int map_arr[MAX_ROW][MAX_COLUMN];
 extern pthread_mutex_t access_map_arr_mutex;
+extern int game_status;
 Bullet_t * create_bullet(int x, int y)  /* x and y are cordinates of the ship */
 {
     Bullet_t *bullet =  (Bullet_t *)malloc(sizeof(Bullet_t));
@@ -48,7 +49,7 @@ void *handle_bullet(void *arg)
     int rt_check;
     Spaceship_t *uship = (Spaceship_t *)arg;
     Bullet_t *mbullet = create_bullet(uship->sx, uship->sy);
-    while(1)
+    while(PLAYING_STATUS == game_status)
     {    
         rt_check = check_coordinate_bullet(mbullet->sx,mbullet->sy);
         if(NULL == mbullet)
@@ -80,5 +81,4 @@ void *handle_bullet(void *arg)
     } 
     free(mbullet);
     pthread_exit(NULL);
-    //return NULL;
 }

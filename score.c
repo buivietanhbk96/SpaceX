@@ -4,6 +4,7 @@ pthread_mutex_t score_mutex;
 extern pthread_mutex_t draw_mutex;
 extern Spaceship_t *my_ship;
 extern int win_line;
+extern int game_status;
 void add_score(int scale)
 {
     pthread_mutex_lock(&score_mutex);
@@ -24,9 +25,13 @@ void add_score(int scale)
 void lose_one_life()
 {
     my_ship->lives -=1;
+    if(0 == my_ship->lives)
+    {
+        game_status = GAMEOVER_STATUS;
+    }
     pthread_mutex_lock(&draw_mutex);
     gotoxy(win_line, 20);
-    printf(" ");
+    printf("       ");
     pthread_mutex_unlock(&draw_mutex);
 }
 
@@ -42,7 +47,7 @@ void draw_score()
     printf("SCORE = %d",score);
     for(i = 0; i < my_ship->lives; i++)
     {
-        gotoxy(win_line, 20 + i);
+        gotoxy(win_line, 20 + i + 1);
         printf(LIVE_CHAR);
     }
     pthread_mutex_unlock(&draw_mutex);

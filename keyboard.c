@@ -13,7 +13,7 @@ void *read_keyboard(void *arg)
     newt = oldt;
     newt.c_lflag &= ~ICANON;                                 /* put in '1 key mode' */
     newt.c_lflag &= ~ECHO;                                   /* turn off echo */
-    while(GAMEOVER_STATUS != game_status)
+    while(PLAYING_STATUS == game_status)
     {
         tcsetattr(STDIN_FILENO, TCSANOW, &newt);             /* echo off 1-key read mode */
         char key = getchar();                                /* get single key immed. */ 
@@ -39,6 +39,7 @@ void *read_keyboard(void *arg)
         } 
         usleep(10);                
     }
+    printf("end keyboard\n");
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);                 /* settings back to normal */
-    return NULL;
+    pthread_exit(NULL);
 }

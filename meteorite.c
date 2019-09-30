@@ -5,6 +5,7 @@ extern int map_arr[MAX_ROW][MAX_COLUMN];
 extern pthread_mutex_t access_map_arr_mutex;
 extern int win_col;
 extern int win_line;
+extern int game_status;
 static void _clear_meteor(Meteorite_t *meteor);
 static void _update_position_meteor(Meteorite_t *meteor, int value)
 {
@@ -54,20 +55,23 @@ void draw_meteorite(Meteorite_t *meteor)
 static void _clear_meteor(Meteorite_t *meteor)
 {
     pthread_mutex_lock(&draw_mutex);
-    switch (meteor->scale)
+    if(meteor->sx > meteor->height)
     {
-    case SMALL:
-        gotoxy(meteor->sx  - 2,meteor->sy);
-        printf("  ");
-        break;
-    case MEDIUM:
-        gotoxy(meteor->sx  - 3,meteor->sy);
-        printf("     ");
-        break;
-    case LARGE:
-        gotoxy(meteor->sx  - 5,meteor->sy);
-        printf("          ");
-        break;
+        switch (meteor->scale)
+        {
+        case SMALL:
+            gotoxy(meteor->sx - 2, meteor->sy);
+            printf("  ");
+            break;
+        case MEDIUM:
+            gotoxy(meteor->sx - 3, meteor->sy);
+            printf("     ");
+            break;
+        case LARGE:
+            gotoxy(meteor->sx - 5, meteor->sy);
+            printf("          ");
+            break;
+        }
     }
     pthread_mutex_unlock(&draw_mutex);
     _update_position_meteor(meteor,EMPTY);
@@ -124,7 +128,7 @@ void *handle_meteorite(void *arg)
 {
     int rt_check = 0;
     Meteorite_t *meteorx = create_meteorite();
-    while(1)
+    while(PLAYING_STATUS == game_status)
     {
         if(NULL == meteorx)
         {

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "ship.h"
 #include "meteorite.h"
+#include "keyboard.h"
 
 #define SMALL_SCORE   100
 #define MEDIUM_SCORE  200

@@ -25,6 +25,7 @@ void *display_score(void *arg)
         usleep(10);
         draw_score();
     }
+    pthread_exit(NULL);
 }
 void *generate_bullet(void *arg)
 {
@@ -46,6 +47,7 @@ void *generate_bullet(void *arg)
         i = i + 1;
     }
     pthread_attr_destroy(&attr);
+    printf("end bullet\n");
     pthread_exit(NULL);
 }
 
@@ -69,12 +71,13 @@ void *generate_meteorite(void *arg)
         sleep(SPEED_GEN_METEORITE);
     }
     pthread_attr_destroy(&attr);
+    printf("end meteo\n");
     pthread_exit(NULL);
 }
 void *control(void *arg)
 {
     char key;
-    while(1)
+    while(PLAYING_STATUS == game_status)
     {
         pthread_mutex_lock(&kqmutex);        /* lock other threads out while we tamper */
         key = '\0';                          /* initialize key to NULL*/
@@ -115,6 +118,7 @@ void *control(void *arg)
             }
         }
     }
+    printf("end control\n");
     pthread_exit(NULL);
 }
 static void _create_map()
@@ -148,6 +152,6 @@ int main(void)
     pthread_join(thread[2], NULL); 
     pthread_join(thread[3], NULL); 
     pthread_join(thread[4], NULL); 
-    printf("GAME OVER");
+    printf("GAME OVER\n");
     return 0;
 }
