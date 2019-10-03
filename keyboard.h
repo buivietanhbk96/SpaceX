@@ -22,4 +22,6 @@ typedef struct keyQueue {
 
 void *read_keyboard(void *arg);
 
+void set_default_terminal(void);
+
 #endif

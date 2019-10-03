@@ -12,10 +12,12 @@
 #define SPEED_GEN_BULLET 100000     /* period to create bullet  (us)*/
 #define SPEED_GEN_METEORITE 5       /* period to create bullet  (s)*/
 
+extern keyQueue_t *keyhead;
+static pthread_t thread[5];
 int map_arr[MAX_ROW][MAX_COLUMN];
 int game_status = PLAYING_STATUS;
 Spaceship_t *my_ship = NULL;
-extern keyQueue_t *keyhead;
+
 pthread_mutex_t kqmutex;
 pthread_mutex_t access_map_arr_mutex;
 void *display_score(void *arg)
@@ -47,7 +49,6 @@ void *generate_bullet(void *arg)
         i = i + 1;
     }
     pthread_attr_destroy(&attr);
-    printf("end bullet\n");
     pthread_exit(NULL);
 }
 
@@ -66,12 +67,11 @@ void *generate_meteorite(void *arg)
         }
         pthread_create(&meteorites[i],&attr, handle_meteorite, NULL);
         /* pthread_join(meteorites[i], NULL);  don't use pthread_join at here*/
-        //pthread_detach(meteorites[i]);
+        /* pthread_detach(meteorites[i]); */
         i = i + 1;
         sleep(SPEED_GEN_METEORITE);
     }
     pthread_attr_destroy(&attr);
-    printf("end meteo\n");
     pthread_exit(NULL);
 }
 void *control(void *arg)
@@ -117,8 +117,10 @@ void *control(void *arg)
                 }                          
             }
         }
+        usleep(10000);
     }
-    printf("end control\n");
+    pthread_cancel(thread[0]);
+    set_default_terminal();
     pthread_exit(NULL);
 }
 static void _create_map()
@@ -137,7 +139,6 @@ void print_map_arr()
 }
 int main(void)
 {
-    pthread_t thread[5];
     printf("\e[?25l\033[H\033[J");   /*clear screen and hide cursor */
     _create_map();
     my_ship = init_spaceship();

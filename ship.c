@@ -20,7 +20,7 @@ Spaceship_t *init_spaceship(void)
     {
         spaceship->sx = win_line - 4;     /* 4 because using array [4][15] to store char of ship */
         spaceship->sy = win_col / 2;
-        spaceship->lives = 3;
+        spaceship->lives = 1;
         spaceship->bullet_type = 1;
     }
     return spaceship;

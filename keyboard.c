@@ -6,16 +6,21 @@ pthread_mutex_t kqmutex;
 static struct termios origtc, newtc;
 
 extern int game_status;
+
+void set_default_terminal(void)
+{
+    tcsetattr(STDIN_FILENO, TCSANOW, &origtc);                 /* settings back to normal */
+    printf("\e[1;1H\e[2J");
+}
 void *read_keyboard(void *arg)
 {
-    static struct termios oldt, newt;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~ICANON;                                 /* put in '1 key mode' */
-    newt.c_lflag &= ~ECHO;                                   /* turn off echo */
+    tcgetattr(STDIN_FILENO, &origtc);
+    newtc = origtc;
+    newtc.c_lflag &= ~ICANON;                                 /* put in '1 key mode' */
+    newtc.c_lflag &= ~ECHO;                                   /* turn off echo */
     while(PLAYING_STATUS == game_status)
     {
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);             /* echo off 1-key read mode */
+        tcsetattr(STDIN_FILENO, TCSANOW, &newtc);             /* echo off 1-key read mode */
         char key = getchar();                                /* get single key immed. */ 
         /* printf("Key '%c' pressed...\n", key); */
         if (NULL != strchr(GROUP_KEY, key))
@@ -39,7 +44,6 @@ void *read_keyboard(void *arg)
         } 
         usleep(10);                
     }
-    printf("end keyboard\n");
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);                 /* settings back to normal */
+    tcsetattr(STDIN_FILENO, TCSANOW, &origtc);                 /* settings back to normal */
     pthread_exit(NULL);
 }

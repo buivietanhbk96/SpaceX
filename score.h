@@ -10,7 +10,7 @@
 #define MEDIUM_SCORE  200
 #define LARGE_SCORE   300
 
-#define LIVE_CHAR "\u2661"
+#define LIVE_CHAR "\u2b21"
 void add_score(int scale);
 int get_score();
 void lose_one_life();
